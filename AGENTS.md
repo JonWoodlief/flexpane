@@ -1,4 +1,4 @@
-# Agent Guide - Flexplane
+# Agent Guide - Flexpane
 
 **Primary Documentation**: See `plan.md` for full architecture, phases, and design decisions.
 

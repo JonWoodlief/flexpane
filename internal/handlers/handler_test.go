@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"flexplane/internal/models"
-	"flexplane/internal/panes"
-	"flexplane/internal/services"
+	"flexpane/internal/models"
+	"flexpane/internal/panes"
+	"flexpane/internal/services"
 )
 
 // MockDataProvider for testing

@@ -1,4 +1,4 @@
-# Flexplane Development Plan
+# Flexpane Development Plan
 
 A lightweight personal productivity app combining calendar, todos, and email in a text-focused interface.
 
@@ -15,7 +15,7 @@ A lightweight personal productivity app combining calendar, todos, and email in 
 ## Architecture
 
 ```
-flexplane/
+flexpane/
 ├── plan.md                    # This file
 ├── main.go                    # Server entry point
 ├── go.mod                     # Go module definition
@@ -42,7 +42,7 @@ flexplane/
 ### Phase 1: Foundation (MVP)
 1. **Project Setup**
    - [x] Create project structure
-   - [ ] Initialize Go module (`flexplane`)
+   - [ ] Initialize Go module (`flexpane`)
    - [ ] Basic HTTP server with static file serving
    - [ ] HTML template rendering setup
 
@@ -223,10 +223,10 @@ type Email struct {
 
 ```bash
 # Create project
-mkdir flexplane && cd flexplane
+mkdir flexpane && cd flexpane
 
 # Initialize Go module
-go mod init flexplane
+go mod init flexpane
 
 # Run development server
 go run main.go
