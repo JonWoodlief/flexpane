@@ -20,15 +20,10 @@ func TestFullApplication_HomePage(t *testing.T) {
 	// Setup full application like main.go
 	todoService := services.NewTodoService("test_integration_todos.json")
 
-	// Use provider factory like main.go
-	providerFactory, err := providers.NewProviderFactory("config/providers.json")
+	// Create data provider
+	dataProvider, err := providers.CreateProvider("mock")
 	if err != nil {
-		t.Fatalf("Failed to create provider factory: %v", err)
-	}
-
-	dataProvider, err := providerFactory.GetDefaultProvider()
-	if err != nil {
-		t.Fatalf("Failed to create default provider: %v", err)
+		t.Fatalf("Failed to create provider: %v", err)
 	}
 
 	// Create registry

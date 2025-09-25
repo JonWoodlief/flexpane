@@ -23,16 +23,10 @@ func main() {
 	// Initialize services
 	todoService := services.NewTodoService("data/todos.json")
 
-	// Initialize provider factory
-	providerFactory, err := providers.NewProviderFactory("config/providers.json")
+	// Create data provider
+	dataProvider, err := providers.CreateProvider("mock")
 	if err != nil {
-		log.Fatalf("Failed to create provider factory: %v", err)
-	}
-
-	// Get default data provider
-	dataProvider, err := providerFactory.GetDefaultProvider()
-	if err != nil {
-		log.Fatalf("Failed to create default provider: %v", err)
+		log.Fatalf("Failed to create provider: %v", err)
 	}
 
 	// Parse templates - include all template files
