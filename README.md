@@ -12,4 +12,4 @@ open http://localhost:3000
 ## Documentation
 
 - [`plan.md`](plan.md) - Full development plan and architecture
-- [`agents.md`](agents.md) - Development conventions
+- [`AGENTS.md`](AGENTS.md) - Development conventions
