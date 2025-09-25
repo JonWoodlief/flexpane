@@ -2,25 +2,36 @@ package providers
 
 import (
 	"log"
-	"os"
 
 	"flexplane/internal/services"
+	"github.com/kelseyhightower/envconfig"
 )
 
-// ProviderFactory creates the appropriate provider based on configuration
-type ProviderFactory struct{}
+// ProviderConfig holds configuration for provider selection
+type ProviderConfig struct {
+	GoogleClientID string `envconfig:"GOOGLE_CLIENT_ID"`
+}
 
-// NewProviderFactory creates a new provider factory
+// ProviderFactory creates the appropriate provider based on configuration
+type ProviderFactory struct {
+	config ProviderConfig
+}
+
+// NewProviderFactory creates a new provider factory with configuration loaded from environment
 func NewProviderFactory() *ProviderFactory {
-	return &ProviderFactory{}
+	var config ProviderConfig
+	if err := envconfig.Process("", &config); err != nil {
+		log.Printf("Error loading provider configuration: %v", err)
+	}
+
+	return &ProviderFactory{
+		config: config,
+	}
 }
 
 // CreateProvider returns either a Gmail provider (if configured) or Mock provider (default)
 func (f *ProviderFactory) CreateProvider() DataProvider {
-	// Check if Google OAuth is configured
-	clientID := os.Getenv("GOOGLE_CLIENT_ID")
-	
-	if clientID != "" {
+	if f.config.GoogleClientID != "" {
 		log.Println("Google OAuth configured - using Gmail provider")
 		return NewGmailProvider()
 	}
@@ -35,9 +46,7 @@ func (f *ProviderFactory) CreateProvider() DataProvider {
 // CreateAuthenticatedProvider returns a Gmail provider that supports authentication
 // Returns nil if Gmail is not configured
 func (f *ProviderFactory) CreateAuthenticatedProvider() AuthenticatedProvider {
-	clientID := os.Getenv("GOOGLE_CLIENT_ID")
-	
-	if clientID != "" {
+	if f.config.GoogleClientID != "" {
 		log.Println("Google OAuth configured - using Gmail provider")
 		return NewGmailProvider()
 	}
