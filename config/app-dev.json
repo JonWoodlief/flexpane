@@ -4,12 +4,6 @@
     "mock": {
       "type": "mock",
       "args": {}
-    },
-    "todos-file": {
-      "type": "file", 
-      "args": {
-        "todo_file": "data/todos.json"
-      }
     }
   },
   "panes": {
@@ -27,7 +21,6 @@
     "todos": {
       "type": "todos",
       "enabled": true,
-      "provider": "todos-file",
       "layout": {
         "grid_area": {
           "row": "2",

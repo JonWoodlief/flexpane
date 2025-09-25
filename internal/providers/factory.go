@@ -10,18 +10,17 @@ type ProviderConfig struct {
 	Args map[string]interface{} `json:"args"`
 }
 
-// ProviderFactory creates providers based on configuration
+// ProviderFactory creates email/calendar providers based on configuration  
 type ProviderFactory struct {
-	constructors map[string]func(map[string]interface{}) (Provider, error)
+	constructors map[string]func(map[string]interface{}) (DataProvider, error)
 }
 
 func NewProviderFactory() *ProviderFactory {
 	factory := &ProviderFactory{
-		constructors: make(map[string]func(map[string]interface{}) (Provider, error)),
+		constructors: make(map[string]func(map[string]interface{}) (DataProvider, error)),
 	}
 	
-	// Register production providers only
-	factory.RegisterProvider("file", factory.createFileProvider)
+	// Register email/calendar providers only
 	factory.RegisterProvider("null", factory.createNullProvider)
 	
 	return factory
@@ -38,12 +37,12 @@ func NewProviderFactoryWithMocks() *ProviderFactory {
 }
 
 // RegisterProvider registers a provider constructor
-func (pf *ProviderFactory) RegisterProvider(providerType string, constructor func(map[string]interface{}) (Provider, error)) {
+func (pf *ProviderFactory) RegisterProvider(providerType string, constructor func(map[string]interface{}) (DataProvider, error)) {
 	pf.constructors[providerType] = constructor
 }
 
 // CreateProvider creates a provider based on configuration
-func (pf *ProviderFactory) CreateProvider(config ProviderConfig) (Provider, error) {
+func (pf *ProviderFactory) CreateProvider(config ProviderConfig) (DataProvider, error) {
 	constructor, exists := pf.constructors[config.Type]
 	if !exists {
 		return nil, fmt.Errorf("unknown provider type: %s", config.Type)
@@ -62,25 +61,10 @@ func (pf *ProviderFactory) GetAvailableProviders() []string {
 }
 
 // Built-in provider constructors
-func (pf *ProviderFactory) createMockProvider(args map[string]interface{}) (Provider, error) {
+func (pf *ProviderFactory) createMockProvider(args map[string]interface{}) (DataProvider, error) {
 	return NewMockProvider(), nil
 }
 
-func (pf *ProviderFactory) createNullProvider(args map[string]interface{}) (Provider, error) {
+func (pf *ProviderFactory) createNullProvider(args map[string]interface{}) (DataProvider, error) {
 	return NewNullProvider(), nil
-}
-
-func (pf *ProviderFactory) createFileProvider(args map[string]interface{}) (Provider, error) {
-	// For file provider, we create a composite provider that uses NullProvider for calendar/email
-	// and TodoFileProvider for todos. This is appropriate for production when real calendar/email
-	// integrations aren't configured yet.
-	todoFilename, ok := args["todo_file"].(string)
-	if !ok {
-		todoFilename = "data/todos.json" // default
-	}
-	
-	return NewCompositeProvider(
-		NewNullProvider(),              // For calendar and email - no fake data in production
-		NewTodoFileProvider(todoFilename), // For todos
-	), nil
 }

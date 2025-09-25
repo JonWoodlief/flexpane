@@ -9,7 +9,6 @@ import (
 
 	"flexplane/internal/models"
 	"flexplane/internal/panes"
-	"flexplane/internal/providers"
 	"flexplane/internal/services"
 )
 
@@ -126,8 +125,8 @@ func TestHandler_TodosAPI_WithTodosPane(t *testing.T) {
 	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
 
 	registry := services.NewPaneRegistry()
-	todoProvider := providers.NewTodoFileProvider("test_todos.json")
-	registry.RegisterPane(panes.NewTodoPane(todoProvider))
+	todoService := services.NewTodoService("test_todos.json")
+	registry.RegisterPane(panes.NewTodoPane(todoService))
 	registry.SetEnabledPanes([]string{"todos"})
 
 	// Set layout config
@@ -161,8 +160,8 @@ func TestHandler_TodosAPI_MethodNotAllowed(t *testing.T) {
 	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
 
 	registry := services.NewPaneRegistry()
-	todoProvider := providers.NewTodoFileProvider("test_method_not_allowed.json")
-	registry.RegisterPane(panes.NewTodoPane(todoProvider))
+	todoService := services.NewTodoService("test_method_not_allowed.json")
+	registry.RegisterPane(panes.NewTodoPane(todoService))
 	registry.SetEnabledPanes([]string{"todos"})
 
 	// Set layout config
@@ -191,8 +190,8 @@ func TestHandler_PaneAPI_Success(t *testing.T) {
 	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
 
 	registry := services.NewPaneRegistry()
-	todoProvider := providers.NewTodoFileProvider("test_pane_api.json")
-	registry.RegisterPane(panes.NewTodoPane(todoProvider))
+	todoService := services.NewTodoService("test_pane_api.json")
+	registry.RegisterPane(panes.NewTodoPane(todoService))
 	registry.SetEnabledPanes([]string{"todos"})
 
 	// Set layout config

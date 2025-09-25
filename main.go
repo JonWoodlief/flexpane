@@ -20,9 +20,14 @@ type AppConfig struct {
 }
 
 func main() {
+	// Load application configuration
+	config := loadAppConfig()
+
+	// Initialize todo service (independent of provider system)
+	todoService := services.NewTodoService("data/todos.json")
+	
 	// Initialize factories - use development factory if mock providers are needed
 	var providerFactory *providers.ProviderFactory
-	config := loadAppConfig()
 	
 	// Check if configuration requires mock providers
 	needsMockProviders := false
@@ -41,7 +46,7 @@ func main() {
 		log.Println("Using production factory")
 	}
 	
-	paneFactory := services.NewPaneFactory()
+	paneFactory := services.NewPaneFactory(todoService)
 
 	// Parse templates - include all template files
 	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
@@ -54,7 +59,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to create provider %s: %v", name, err)
 		}
-		paneFactory.RegisterProvider(name, provider)
+		paneFactory.RegisterDataProvider(name, provider)
 	}
 
 	// Create pane registry
@@ -110,10 +115,8 @@ func loadAppConfig() AppConfig {
 	defaultConfig := AppConfig{
 		Providers: map[string]providers.ProviderConfig{
 			"default": {
-				Type: "file",
-				Args: map[string]interface{}{
-					"todo_file": "data/todos.json",
-				},
+				Type: "null",
+				Args: map[string]interface{}{},
 			},
 		},
 		Panes: map[string]services.PaneConfig{

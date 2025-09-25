@@ -18,13 +18,13 @@ import (
 // Integration tests - test the full application flow
 func TestFullApplication_HomePage(t *testing.T) {
 	// Setup full application like main.go
-	todoProvider := providers.NewTodoFileProvider("test_integration_todos.json")
+	todoService := services.NewTodoService("test_integration_todos.json")
 	mockProvider := providers.NewMockProvider()
 
 	// Create registry
 	registry := services.NewPaneRegistry()
 	registry.RegisterPane(panes.NewCalendarPane(mockProvider))
-	registry.RegisterPane(panes.NewTodoPane(todoProvider))
+	registry.RegisterPane(panes.NewTodoPane(todoService))
 	registry.RegisterPane(panes.NewEmailPane(mockProvider))
 	registry.SetEnabledPanes([]string{"calendar", "todos", "email"})
 
@@ -66,9 +66,9 @@ func TestFullApplication_HomePage(t *testing.T) {
 
 func TestFullApplication_TodosAPI(t *testing.T) {
 	// Setup
-	todoProvider := providers.NewTodoFileProvider("test_integration_todos_api.json")
+	todoService := services.NewTodoService("test_integration_todos_api.json")
 	registry := services.NewPaneRegistry()
-	registry.RegisterPane(panes.NewTodoPane(todoProvider))
+	registry.RegisterPane(panes.NewTodoPane(todoService))
 	registry.SetEnabledPanes([]string{"todos"})
 
 	templates, err := loadTemplates()

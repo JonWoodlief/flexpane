@@ -106,19 +106,3 @@ func (m *MockProvider) GetEmails() ([]models.Email, error) {
 
 	return emails, nil
 }
-
-// Mock implementation of TodoProvider interface
-func (m *MockProvider) GetTodos() []models.Todo {
-	// Return empty todos for mock provider - real implementations would store/retrieve todos
-	return []models.Todo{}
-}
-
-func (m *MockProvider) AddTodo(message string) error {
-	// Mock implementation - real implementations would persist the todo
-	return nil
-}
-
-func (m *MockProvider) ToggleTodo(index int) error {
-	// Mock implementation - real implementations would toggle and persist the todo
-	return nil
-}

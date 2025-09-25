@@ -19,81 +19,101 @@ type PaneConfig struct {
 
 // PaneFactory creates panes based on configuration
 type PaneFactory struct {
-	constructors     map[string]func(providers.Provider, map[string]interface{}) models.Pane
-	providerRegistry map[string]providers.Provider
+	dataProviderConstructors map[string]func(providers.DataProvider, map[string]interface{}) models.Pane
+	serviceConstructors      map[string]func(map[string]interface{}) models.Pane
+	dataProviderRegistry     map[string]providers.DataProvider
+	todoService              models.TodoService
 }
 
-func NewPaneFactory() *PaneFactory {
+func NewPaneFactory(todoService models.TodoService) *PaneFactory {
 	factory := &PaneFactory{
-		constructors:     make(map[string]func(providers.Provider, map[string]interface{}) models.Pane),
-		providerRegistry: make(map[string]providers.Provider),
+		dataProviderConstructors: make(map[string]func(providers.DataProvider, map[string]interface{}) models.Pane),
+		serviceConstructors:      make(map[string]func(map[string]interface{}) models.Pane),
+		dataProviderRegistry:     make(map[string]providers.DataProvider),
+		todoService:              todoService,
 	}
 
-	// Register built-in pane types
-	factory.RegisterPaneType("calendar", factory.createCalendarPane)
-	factory.RegisterPaneType("todos", factory.createTodoPane)
-	factory.RegisterPaneType("email", factory.createEmailPane)
+	// Register built-in data provider pane types (calendar, email)
+	factory.RegisterDataProviderPaneType("calendar", factory.createCalendarPane)
+	factory.RegisterDataProviderPaneType("email", factory.createEmailPane)
+	
+	// Register built-in service pane types (todos)
+	factory.RegisterServicePaneType("todos", factory.createTodoPane)
 
 	return factory
 }
 
-// RegisterPaneType registers a pane constructor
-func (pf *PaneFactory) RegisterPaneType(paneType string, constructor func(providers.Provider, map[string]interface{}) models.Pane) {
-	pf.constructors[paneType] = constructor
+// RegisterDataProviderPaneType registers a pane constructor that uses DataProvider
+func (pf *PaneFactory) RegisterDataProviderPaneType(paneType string, constructor func(providers.DataProvider, map[string]interface{}) models.Pane) {
+	pf.dataProviderConstructors[paneType] = constructor
 }
 
-// RegisterProvider registers a provider instance
-func (pf *PaneFactory) RegisterProvider(name string, provider providers.Provider) {
-	pf.providerRegistry[name] = provider
+// RegisterServicePaneType registers a pane constructor that uses services
+func (pf *PaneFactory) RegisterServicePaneType(paneType string, constructor func(map[string]interface{}) models.Pane) {
+	pf.serviceConstructors[paneType] = constructor
+}
+
+// RegisterDataProvider registers a data provider instance
+func (pf *PaneFactory) RegisterDataProvider(name string, provider providers.DataProvider) {
+	pf.dataProviderRegistry[name] = provider
 }
 
 // CreatePane creates a pane based on configuration
 func (pf *PaneFactory) CreatePane(config PaneConfig) (models.Pane, error) {
-	constructor, exists := pf.constructors[config.Type]
-	if !exists {
-		return nil, fmt.Errorf("unknown pane type: %s", config.Type)
+	// Check if it's a data provider pane type
+	if constructor, exists := pf.dataProviderConstructors[config.Type]; exists {
+		// Get data provider for this pane
+		var provider providers.DataProvider
+		if config.Provider != "" {
+			var ok bool
+			provider, ok = pf.dataProviderRegistry[config.Provider]
+			if !ok {
+				return nil, fmt.Errorf("unknown data provider: %s", config.Provider)
+			}
+		} else {
+			// Use default provider (first available)
+			for _, p := range pf.dataProviderRegistry {
+				provider = p
+				break
+			}
+			if provider == nil {
+				return nil, fmt.Errorf("no data providers available")
+			}
+		}
+		
+		return constructor(provider, config.Args), nil
 	}
-
-	// Get provider for this pane
-	var provider providers.Provider
-	if config.Provider != "" {
-		var ok bool
-		provider, ok = pf.providerRegistry[config.Provider]
-		if !ok {
-			return nil, fmt.Errorf("unknown provider: %s", config.Provider)
-		}
-	} else {
-		// Use default provider (first available)
-		for _, p := range pf.providerRegistry {
-			provider = p
-			break
-		}
-		if provider == nil {
-			return nil, fmt.Errorf("no providers available")
-		}
+	
+	// Check if it's a service pane type
+	if constructor, exists := pf.serviceConstructors[config.Type]; exists {
+		return constructor(config.Args), nil
 	}
-
-	return constructor(provider, config.Args), nil
+	
+	return nil, fmt.Errorf("unknown pane type: %s", config.Type)
 }
 
 // GetAvailablePaneTypes returns list of available pane types
 func (pf *PaneFactory) GetAvailablePaneTypes() []string {
 	var types []string
-	for paneType := range pf.constructors {
+	for paneType := range pf.dataProviderConstructors {
+		types = append(types, paneType)
+	}
+	for paneType := range pf.serviceConstructors {
 		types = append(types, paneType)
 	}
 	return types
 }
 
-// Built-in pane constructors
-func (pf *PaneFactory) createCalendarPane(provider providers.Provider, args map[string]interface{}) models.Pane {
+// Built-in data provider pane constructors
+func (pf *PaneFactory) createCalendarPane(provider providers.DataProvider, args map[string]interface{}) models.Pane {
 	return panes.NewCalendarPane(provider)
 }
 
-func (pf *PaneFactory) createTodoPane(provider providers.Provider, args map[string]interface{}) models.Pane {
-	return panes.NewTodoPane(provider)
+func (pf *PaneFactory) createEmailPane(provider providers.DataProvider, args map[string]interface{}) models.Pane {
+	return panes.NewEmailPane(provider)
 }
 
-func (pf *PaneFactory) createEmailPane(provider providers.Provider, args map[string]interface{}) models.Pane {
-	return panes.NewEmailPane(provider)
+// Built-in service pane constructors
+func (pf *PaneFactory) createTodoPane(args map[string]interface{}) models.Pane {
+	return panes.NewTodoPane(pf.todoService)
 }

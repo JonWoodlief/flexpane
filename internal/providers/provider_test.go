@@ -1,7 +1,6 @@
 package providers
 
 import (
-	"os"
 	"testing"
 )
 
@@ -25,135 +24,27 @@ func TestMockProvider(t *testing.T) {
 	if len(emails) == 0 {
 		t.Error("Expected mock emails, got none")
 	}
-
-	// Test todos (should be empty for mock)
-	todos := provider.GetTodos()
-	if len(todos) != 0 {
-		t.Errorf("Expected empty todos from mock provider, got %d", len(todos))
-	}
-
-	// Test add todo (should not error but does nothing)
-	err = provider.AddTodo("test todo")
-	if err != nil {
-		t.Errorf("AddTodo failed: %v", err)
-	}
-
-	// Test toggle todo (should not error but does nothing)
-	err = provider.ToggleTodo(0)
-	if err != nil {
-		t.Errorf("ToggleTodo failed: %v", err)
-	}
 }
 
-func TestTodoFileProvider(t *testing.T) {
-	testFile := "test_provider_todos.json"
-	defer os.Remove(testFile) // cleanup
+func TestNullProvider(t *testing.T) {
+	provider := NewNullProvider()
 
-	provider := NewTodoFileProvider(testFile)
-
-	// Initially should have no todos
-	todos := provider.GetTodos()
-	if len(todos) != 0 {
-		t.Errorf("Expected 0 todos initially, got %d", len(todos))
-	}
-
-	// Add a todo
-	err := provider.AddTodo("Test todo item")
-	if err != nil {
-		t.Errorf("AddTodo failed: %v", err)
-	}
-
-	// Should now have one todo
-	todos = provider.GetTodos()
-	if len(todos) != 1 {
-		t.Errorf("Expected 1 todo after adding, got %d", len(todos))
-	}
-
-	if todos[0].Message != "Test todo item" {
-		t.Errorf("Expected 'Test todo item', got '%s'", todos[0].Message)
-	}
-
-	if todos[0].Done {
-		t.Error("Expected new todo to be not done")
-	}
-
-	// Toggle the todo
-	err = provider.ToggleTodo(0)
-	if err != nil {
-		t.Errorf("ToggleTodo failed: %v", err)
-	}
-
-	todos = provider.GetTodos()
-	if !todos[0].Done {
-		t.Error("Expected todo to be done after toggle")
-	}
-
-	// Toggle again
-	err = provider.ToggleTodo(0)
-	if err != nil {
-		t.Errorf("ToggleTodo failed: %v", err)
-	}
-
-	todos = provider.GetTodos()
-	if todos[0].Done {
-		t.Error("Expected todo to be not done after second toggle")
-	}
-
-	// Test invalid index
-	err = provider.ToggleTodo(999)
-	if err != nil {
-		t.Errorf("ToggleTodo with invalid index should not error: %v", err)
-	}
-}
-
-func TestCompositeProvider(t *testing.T) {
-	mockProvider := NewMockProvider()
-	todoProvider := NewTodoFileProvider("test_composite_todos.json")
-	defer os.Remove("test_composite_todos.json") // cleanup
-
-	composite := NewCompositeProvider(mockProvider, todoProvider)
-
-	// Test that it correctly delegates to data provider
-	events, err := composite.GetCalendarEvents()
+	// Test calendar events (should be empty)
+	events, err := provider.GetCalendarEvents()
 	if err != nil {
 		t.Errorf("GetCalendarEvents failed: %v", err)
 	}
-	if len(events) == 0 {
-		t.Error("Expected calendar events from composite provider")
+	if len(events) != 0 {
+		t.Errorf("Expected 0 events from null provider, got %d", len(events))
 	}
 
-	emails, err := composite.GetEmails()
+	// Test emails (should be empty)
+	emails, err := provider.GetEmails()
 	if err != nil {
 		t.Errorf("GetEmails failed: %v", err)
 	}
-	if len(emails) == 0 {
-		t.Error("Expected emails from composite provider")
-	}
-
-	// Test that it correctly delegates to todo provider
-	todos := composite.GetTodos()
-	if len(todos) != 0 {
-		t.Errorf("Expected 0 todos initially from composite, got %d", len(todos))
-	}
-
-	err = composite.AddTodo("Composite test todo")
-	if err != nil {
-		t.Errorf("AddTodo failed on composite: %v", err)
-	}
-
-	todos = composite.GetTodos()
-	if len(todos) != 1 {
-		t.Errorf("Expected 1 todo after adding to composite, got %d", len(todos))
-	}
-
-	err = composite.ToggleTodo(0)
-	if err != nil {
-		t.Errorf("ToggleTodo failed on composite: %v", err)
-	}
-
-	todos = composite.GetTodos()
-	if !todos[0].Done {
-		t.Error("Expected todo to be done after toggle on composite")
+	if len(emails) != 0 {
+		t.Errorf("Expected 0 emails from null provider, got %d", len(emails))
 	}
 }
 
@@ -162,7 +53,7 @@ func TestProviderFactory(t *testing.T) {
 
 	// Test that production providers are registered (no mock)
 	available := factory.GetAvailableProviders()
-	expectedTypes := []string{"file", "null"}
+	expectedTypes := []string{"null"}
 	
 	for _, expected := range expectedTypes {
 		found := false
@@ -193,22 +84,6 @@ func TestProviderFactory(t *testing.T) {
 		t.Error("Expected non-nil null provider")
 	}
 
-	// Test creating file provider
-	fileProvider, err := factory.CreateProvider(ProviderConfig{
-		Type: "file",
-		Args: map[string]interface{}{
-			"todo_file": "test_factory_todos.json",
-		},
-	})
-	defer os.Remove("test_factory_todos.json") // cleanup
-	
-	if err != nil {
-		t.Errorf("Failed to create file provider: %v", err)
-	}
-	if fileProvider == nil {
-		t.Error("Expected non-nil file provider")
-	}
-
 	// Test creating unknown provider
 	_, err = factory.CreateProvider(ProviderConfig{Type: "unknown"})
 	if err == nil {
@@ -222,7 +97,7 @@ func TestProviderFactory(t *testing.T) {
 	}
 
 	// Test custom provider registration
-	factory.RegisterProvider("custom", func(args map[string]interface{}) (Provider, error) {
+	factory.RegisterProvider("custom", func(args map[string]interface{}) (DataProvider, error) {
 		return NewNullProvider(), nil
 	})
 
@@ -240,7 +115,7 @@ func TestProviderFactoryWithMocks(t *testing.T) {
 
 	// Test that both production and mock providers are available
 	available := factory.GetAvailableProviders()
-	expectedTypes := []string{"file", "null", "mock"}
+	expectedTypes := []string{"null", "mock"}
 	
 	for _, expected := range expectedTypes {
 		found := false
