@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"html/template"
+	"log"
 	"net/http"
 
 	"flexplane/internal/models"
@@ -27,7 +28,8 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 	// Get all enabled panes with their data
 	panes, err := h.registry.GetEnabledPanes(ctx)
 	if err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		log.Printf("Error getting enabled panes: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -39,7 +41,8 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 	// Render template
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if err := h.templates.ExecuteTemplate(w, "layout.html", data); err != nil {
-		http.Error(w, "Internal Server Error", 500)
+		log.Printf("Error executing template: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 }
@@ -51,7 +54,8 @@ func (h *Handler) TodosAPI(w http.ResponseWriter, r *http.Request) {
 	// Get the todos pane from registry
 	todosPane, exists := h.registry.GetPane("todos")
 	if !exists {
-		http.Error(w, "Todos pane not found", 404)
+		log.Printf("Todos pane not found in registry")
+		http.Error(w, "Todos pane not found", http.StatusNotFound)
 		return
 	}
 
@@ -61,21 +65,25 @@ func (h *Handler) TodosAPI(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		data, err := todosPane.GetData(r.Context())
 		if err != nil {
-			http.Error(w, "Internal Server Error", 500)
+			log.Printf("Error getting todos data: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(data)
+		if err := json.NewEncoder(w).Encode(data); err != nil {
+			log.Printf("Error encoding JSON response: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 
 	case "POST":
 		// TODO: Implement add todo via pane interface
-		http.Error(w, "Not implemented yet", 501)
+		http.Error(w, "Not implemented yet", http.StatusNotImplemented)
 
 	case "PATCH":
 		// TODO: Implement toggle todo via pane interface
-		http.Error(w, "Not implemented yet", 501)
+		http.Error(w, "Not implemented yet", http.StatusNotImplemented)
 
 	default:
-		http.Error(w, "Method Not Allowed", 405)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
 }

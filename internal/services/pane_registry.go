@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"log"
 
 	"flexplane/internal/models"
 )
@@ -48,12 +49,14 @@ func (pr *PaneRegistry) GetEnabledPanes(ctx context.Context) ([]models.PaneData,
 	for _, paneID := range pr.enabled {
 		pane, exists := pr.panes[paneID]
 		if !exists {
+			log.Printf("Warning: enabled pane '%s' not found in registry, skipping", paneID)
 			continue // Skip missing panes gracefully
 		}
 
 		data, err := pane.GetData(ctx)
 		if err != nil {
-			// TODO: Add logging, for now continue with nil data
+			log.Printf("Error getting data for pane '%s': %v", paneID, err)
+			// Continue with nil data rather than failing entirely
 			data = nil
 		}
 

@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 	"time"
 
 	"flexplane/internal/handlers"
@@ -23,10 +27,21 @@ func main() {
 	todoService := services.NewTodoService("data/todos.json")
 	mockProvider := services.NewMockProvider()
 
-	// Parse templates - include all template files
-	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
-	tmpl = template.Must(tmpl.ParseGlob("web/templates/components/*.html"))
-	tmpl = template.Must(tmpl.ParseGlob("web/templates/panes/*.html"))
+	// Parse templates - include all template files with error handling
+	tmpl, err := template.ParseGlob("web/templates/*.html")
+	if err != nil {
+		log.Fatalf("Failed to parse main templates: %v", err)
+	}
+	
+	tmpl, err = tmpl.ParseGlob("web/templates/components/*.html")
+	if err != nil {
+		log.Fatalf("Failed to parse component templates: %v", err)
+	}
+	
+	tmpl, err = tmpl.ParseGlob("web/templates/panes/*.html")
+	if err != nil {
+		log.Fatalf("Failed to parse pane templates: %v", err)
+	}
 
 	// Create pane registry
 	registry := services.NewPaneRegistry()
@@ -60,18 +75,53 @@ func main() {
 	http.HandleFunc("/api/todos", handler.TodosAPI)
 	// TODO: Add pane-specific API endpoints
 
-	// Static files
-	fs := http.FileServer(http.Dir("web/static/"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	// Static files - secure file serving to prevent directory traversal
+	staticDir := http.Dir("web/static/")
+	fs := http.FileServer(staticDir)
+	http.Handle("/static/", http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Prevent directory traversal by cleaning the path
+		if strings.Contains(r.URL.Path, "..") {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+		fs.ServeHTTP(w, r)
+	})))
 
-	// Start server
+	// Start server with graceful shutdown
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	
 	server := &http.Server{
-		Addr:         ":3000",
+		Addr:         ":" + port,
 		Handler:      nil,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 
-	log.Println("Flexplane (extensible panes) server starting on :3000")
-	log.Fatal(server.ListenAndServe())
+	// Start server in a goroutine
+	go func() {
+		log.Printf("Flexplane (extensible panes) server starting on :%s", port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server startup failed: %v", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down server...")
+
+	// Give outstanding requests 30 seconds to complete
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server exited")
 }
