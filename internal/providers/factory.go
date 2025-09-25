@@ -15,8 +15,8 @@ const (
 
 // ProviderConfig holds configuration for data providers
 type ProviderConfig struct {
-	Type   ProviderType               `json:"type"`
-	Config map[string]interface{}     `json:"config,omitempty"`
+	Type   ProviderType           `json:"type"`
+	Config map[string]interface{} `json:"config,omitempty"`
 }
 
 // DataProviderConfig represents the configuration for all data providers
@@ -76,7 +76,6 @@ func (f *ProviderFactory) GetDefaultProvider() (DataProvider, error) {
 }
 
 // createMockProvider creates a mock provider (no configuration needed)
-func (f *ProviderFactory) createMockProvider(config map[string]interface{}) (DataProvider, error) {
+func (f *ProviderFactory) createMockProvider(_ map[string]interface{}) (DataProvider, error) {
 	return NewMockProvider(), nil
 }
-
