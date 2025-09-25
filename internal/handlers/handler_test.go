@@ -113,8 +113,8 @@ func TestHandler_TodosAPI_PaneNotFound(t *testing.T) {
 	}
 
 	body := recorder.Body.String()
-	if body != "Todos pane not found\n" {
-		t.Errorf("Expected 'Todos pane not found', got %s", body)
+	if body != "Pane not found\n" {
+		t.Errorf("Expected 'Pane not found', got %s", body)
 	}
 }
 

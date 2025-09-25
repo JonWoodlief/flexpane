@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "done": true,
+    "message": "Test todo item"
+  },
+  {
+    "done": true,
+    "message": "Review security improvements"
+  },
+  {
+    "done": false,
+    "message": "Test extensible API"
+  },
+  {
+    "done": false,
+    "message": "Improved architecture for extensibility"
+  }
+]

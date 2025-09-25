@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"net/http"
 	"time"
 )
 
@@ -26,6 +27,11 @@ type Pane interface {
 	Title() string
 	GetData(ctx context.Context) (interface{}, error)
 	Template() string
+}
+
+// APIHandler interface for panes that need API endpoints
+type APIHandler interface {
+	HandleAPI(w http.ResponseWriter, r *http.Request) error
 }
 
 // PaneData holds the rendered data for a pane

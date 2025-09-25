@@ -37,16 +37,12 @@ func main() {
 	registry.RegisterPane(panes.NewEmailPane(mockProvider))
 
 	// Load pane configuration
-	configData, err := os.ReadFile("config/panes.json")
-	if err != nil {
-		log.Printf("Could not read pane config, using defaults: %v", err)
-		registry.SetEnabledPanes([]string{"calendar", "todos", "email"})
-	} else {
+	defaultPanes := []string{"calendar", "todos", "email"}
+	registry.SetEnabledPanes(defaultPanes) // Set defaults first
+	
+	if configData, err := os.ReadFile("config/panes.json"); err == nil {
 		var config PaneConfig
-		if err := json.Unmarshal(configData, &config); err != nil {
-			log.Printf("Could not parse pane config, using defaults: %v", err)
-			registry.SetEnabledPanes([]string{"calendar", "todos", "email"})
-		} else {
+		if err := json.Unmarshal(configData, &config); err == nil {
 			registry.SetEnabledPanes(config.Enabled)
 			registry.SetLayoutConfig(config.Layout)
 		}
@@ -57,10 +53,12 @@ func main() {
 
 	// Routes
 	http.HandleFunc("/", handler.Home)
-	http.HandleFunc("/api/todos", handler.TodosAPI)
-	// TODO: Add pane-specific API endpoints
+	http.HandleFunc("/api/todos", handler.TodosAPI) // Legacy route for backward compatibility
+	// TODO: Add generic /api/{pane} route pattern for extensibility
 
-	// Static files
+	// Static files  
+	// TODO: SECURITY - Static file serving vulnerable to directory traversal attacks (../../../etc/passwd)
+	// Consider implementing path validation or using a more secure static file handler
 	fs := http.FileServer(http.Dir("web/static/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
