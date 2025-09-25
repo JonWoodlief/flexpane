@@ -1,7 +1,7 @@
 package providers
 
 import (
-	"flexplane/internal/models"
+	"flexpane/internal/models"
 	"time"
 )
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"flexplane/internal/services"
+	"flexpane/internal/services"
 )
 
 // TodoPane implements the Pane interface for todo items

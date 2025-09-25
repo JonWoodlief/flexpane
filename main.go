@@ -8,10 +8,10 @@ import (
 	"os"
 	"time"
 
-	"flexplane/internal/handlers"
-	"flexplane/internal/panes"
-	"flexplane/internal/providers"
-	"flexplane/internal/services"
+	"flexpane/internal/handlers"
+	"flexpane/internal/panes"
+	"flexpane/internal/providers"
+	"flexpane/internal/services"
 )
 
 type PaneConfig struct {
@@ -82,6 +82,6 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	log.Println("Flexplane (extensible panes) server starting on :3000")
+	log.Println("Flexpane (extensible panes) server starting on :3000")
 	log.Fatal(server.ListenAndServe())
 }

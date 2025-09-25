@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"flexplane/internal/handlers"
-	"flexplane/internal/panes"
-	"flexplane/internal/providers"
-	"flexplane/internal/services"
+	"flexpane/internal/handlers"
+	"flexpane/internal/panes"
+	"flexpane/internal/providers"
+	"flexpane/internal/services"
 )
 
 // Integration tests - test the full application flow
@@ -61,7 +61,7 @@ func TestFullApplication_HomePage(t *testing.T) {
 
 	// Check all panes are present
 	expectedContent := []string{
-		"Flexplane",     // Page title
+		"Flexpane",     // Page title
 		"Calendar",      // Calendar pane
 		"Todos",         // Todo pane
 		"Email Preview", // Email pane

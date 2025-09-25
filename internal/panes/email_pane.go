@@ -3,8 +3,8 @@ package panes
 import (
 	"context"
 
-	"flexplane/internal/models"
-	"flexplane/internal/providers"
+	"flexpane/internal/models"
+	"flexpane/internal/providers"
 )
 
 // EmailPane implements the Pane interface for email messages
