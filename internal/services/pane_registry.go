@@ -2,16 +2,11 @@ package services
 
 import (
 	"context"
-	"log"
 
 	"flexplane/internal/models"
 )
 
 // PaneRegistry manages all available panes
-// Thread safety: This registry is designed for single-threaded initialization
-// followed by read-only access during request handling. All panes are registered
-// during startup, and enabled/layout configuration is set once. The maps are
-// not modified during request processing, making concurrent reads safe.
 type PaneRegistry struct {
 	panes   map[string]models.Pane
 	enabled []string
@@ -53,14 +48,12 @@ func (pr *PaneRegistry) GetEnabledPanes(ctx context.Context) ([]models.PaneData,
 	for _, paneID := range pr.enabled {
 		pane, exists := pr.panes[paneID]
 		if !exists {
-			log.Printf("Warning: enabled pane '%s' not found in registry, skipping", paneID)
 			continue // Skip missing panes gracefully
 		}
 
 		data, err := pane.GetData(ctx)
 		if err != nil {
-			log.Printf("Error getting data for pane '%s': %v", paneID, err)
-			// Continue with nil data rather than failing entirely
+			// TODO: Add logging, for now continue with nil data
 			data = nil
 		}
 

@@ -2,6 +2,9 @@ package panes
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"strconv"
 
 	"flexplane/internal/services"
 )
@@ -39,12 +42,68 @@ func (tp *TodoPane) GetData(ctx context.Context) (interface{}, error) {
 	}, nil
 }
 
-// AddTodo adds a new todo item
-func (tp *TodoPane) AddTodo(message string) error {
-	return tp.todoService.AddTodo(message)
+// HandleAPI implements the APIHandler interface for todo-specific operations
+func (tp *TodoPane) HandleAPI(w http.ResponseWriter, r *http.Request) error {
+	switch r.Method {
+	case "GET":
+		data, err := tp.GetData(r.Context())
+		if err != nil {
+			return err
+		}
+		w.Header().Set("Content-Type", "application/json")
+		return json.NewEncoder(w).Encode(data)
+
+	case "POST":
+		return tp.handleAddTodo(w, r)
+
+	case "PATCH":
+		return tp.handleToggleTodo(w, r)
+
+	default:
+		http.Error(w, "Method Not Allowed", 405)
+		return nil
+	}
 }
 
-// ToggleTodo toggles the done status of a todo item by index
-func (tp *TodoPane) ToggleTodo(index int) error {
-	return tp.todoService.ToggleTodo(index)
+func (tp *TodoPane) handleAddTodo(w http.ResponseWriter, r *http.Request) error {
+	var req struct {
+		Message string `json:"message"`
+	}
+	
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid JSON", 400)
+		return nil
+	}
+	
+	if req.Message == "" {
+		http.Error(w, "Message required", 400)
+		return nil
+	}
+	
+	if err := tp.todoService.AddTodo(req.Message); err != nil {
+		return err
+	}
+	
+	w.WriteHeader(201)
+	return json.NewEncoder(w).Encode(map[string]string{"status": "created"})
+}
+
+func (tp *TodoPane) handleToggleTodo(w http.ResponseWriter, r *http.Request) error {
+	indexStr := r.URL.Query().Get("index")
+	if indexStr == "" {
+		http.Error(w, "Index required", 400)
+		return nil
+	}
+	
+	index, err := strconv.Atoi(indexStr)
+	if err != nil || index < 0 {
+		http.Error(w, "Invalid index", 400)
+		return nil
+	}
+	
+	if err := tp.todoService.ToggleTodo(index); err != nil {
+		return err
+	}
+	
+	return json.NewEncoder(w).Encode(map[string]string{"status": "updated"})
 }

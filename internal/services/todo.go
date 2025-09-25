@@ -2,7 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
@@ -32,10 +31,6 @@ func (s *TodoService) GetTodos() []models.Todo {
 }
 
 func (s *TodoService) AddTodo(message string) error {
-	if message == "" {
-		return fmt.Errorf("todo message cannot be empty")
-	}
-	
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -52,7 +47,7 @@ func (s *TodoService) ToggleTodo(index int) error {
 	defer s.mutex.Unlock()
 
 	if index < 0 || index >= len(s.todos) {
-		return fmt.Errorf("invalid todo index: %d (valid range: 0-%d)", index, len(s.todos)-1)
+		return nil // Invalid index, ignore
 	}
 
 	s.todos[index].Done = !s.todos[index].Done
