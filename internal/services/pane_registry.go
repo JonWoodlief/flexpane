@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"flexpane/internal/models"
 )
@@ -78,4 +79,44 @@ func (pr *PaneRegistry) GetEnabledPanes(ctx context.Context) ([]models.PaneData,
 func (pr *PaneRegistry) GetPane(paneID string) (models.Pane, bool) {
 	pane, exists := pr.panes[paneID]
 	return pane, exists
+}
+
+// GetTypedPane returns a typed pane by ID for type-safe operations
+func GetTypedPane[T any](pr *PaneRegistry, paneID string) (models.TypedPane[T], bool) {
+	pane, exists := pr.panes[paneID]
+	if !exists {
+		return nil, false
+	}
+	
+	typedPane, ok := pane.(models.TypedPane[T])
+	if !ok {
+		return nil, false
+	}
+	
+	return typedPane, true
+}
+
+// GetTypedPaneData returns typed pane data by ID
+func GetTypedPaneData[T any](ctx context.Context, pr *PaneRegistry, paneID string) (models.TypedPaneData[T], error) {
+	typedPane, exists := GetTypedPane[T](pr, paneID)
+	if !exists {
+		var zero models.TypedPaneData[T]
+		return zero, fmt.Errorf("pane not found: %s", paneID)
+	}
+	
+	data, err := typedPane.GetTypedData(ctx)
+	if err != nil {
+		var zero models.TypedPaneData[T]
+		return zero, err
+	}
+	
+	layoutConfig := pr.layout[paneID]
+	
+	return models.TypedPaneData[T]{
+		ID:       typedPane.ID(),
+		Title:    typedPane.Title(),
+		GridArea: layoutConfig.GridArea,
+		Data:     data,
+		Template: typedPane.Template(),
+	}, nil
 }

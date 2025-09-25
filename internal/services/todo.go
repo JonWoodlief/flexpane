@@ -9,6 +9,12 @@ import (
 	"flexpane/internal/models"
 )
 
+// Generic service interface for type-safe operations
+type Service[T any] interface {
+	GetData() []T
+}
+
+// TodoService implements Service[models.Todo]
 type TodoService struct {
 	filename string
 	todos    []models.Todo
@@ -28,6 +34,11 @@ func (s *TodoService) GetTodos() []models.Todo {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	return s.todos
+}
+
+// GetData implements the generic Service interface
+func (s *TodoService) GetData() []models.Todo {
+	return s.GetTodos()
 }
 
 func (s *TodoService) AddTodo(message string) error {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"flexpane/internal/models"
 	"flexpane/internal/services"
 )
 
@@ -39,6 +40,16 @@ func (tp *TodoPane) GetData(ctx context.Context) (interface{}, error) {
 	return map[string]interface{}{
 		"Todos": todos,
 		"Count": len(todos),
+	}, nil
+}
+
+// GetTypedData implements the TypedPane interface for type-safe data access
+func (tp *TodoPane) GetTypedData(ctx context.Context) (models.TodoPaneData, error) {
+	todos := tp.todoService.GetData()
+
+	return models.TodoPaneData{
+		Todos: todos,
+		Count: len(todos),
 	}, nil
 }
 

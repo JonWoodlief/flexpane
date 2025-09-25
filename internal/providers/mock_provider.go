@@ -28,3 +28,29 @@ func (m *MockProvider) GetEmails() ([]models.Email, error) {
 		{ID: "3", Subject: "Newsletter", From: "news@tech.com", Preview: "AI developments...", Time: now.Add(-30 * time.Minute), Read: false},
 	}, nil
 }
+
+// CalendarProviderImpl provides typed access to calendar events
+type CalendarProviderImpl struct {
+	provider DataProvider
+}
+
+func NewCalendarProvider(provider DataProvider) CalendarProvider {
+	return &CalendarProviderImpl{provider: provider}
+}
+
+func (cp *CalendarProviderImpl) GetData() ([]models.Event, error) {
+	return cp.provider.GetCalendarEvents()
+}
+
+// EmailProviderImpl provides typed access to emails
+type EmailProviderImpl struct {
+	provider DataProvider
+}
+
+func NewEmailProvider(provider DataProvider) EmailProvider {
+	return &EmailProviderImpl{provider: provider}
+}
+
+func (ep *EmailProviderImpl) GetData() ([]models.Email, error) {
+	return ep.provider.GetEmails()
+}

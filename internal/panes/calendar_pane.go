@@ -10,11 +10,13 @@ import (
 // CalendarPane implements the Pane interface for calendar events
 type CalendarPane struct {
 	provider providers.DataProvider
+	typedProvider providers.CalendarProvider
 }
 
 func NewCalendarPane(provider providers.DataProvider) *CalendarPane {
 	return &CalendarPane{
 		provider: provider,
+		typedProvider: providers.NewCalendarProvider(provider),
 	}
 }
 
@@ -25,7 +27,6 @@ func (cp *CalendarPane) ID() string {
 func (cp *CalendarPane) Title() string {
 	return "Calendar"
 }
-
 
 func (cp *CalendarPane) Template() string {
 	return "panes/calendar.html"
@@ -43,5 +44,21 @@ func (cp *CalendarPane) GetData(ctx context.Context) (interface{}, error) {
 	return map[string]interface{}{
 		"Events": events,
 		"Count":  len(events),
+	}, nil
+}
+
+// GetTypedData implements the TypedPane interface for type-safe data access
+func (cp *CalendarPane) GetTypedData(ctx context.Context) (models.CalendarPaneData, error) {
+	events, err := cp.typedProvider.GetData()
+	if err != nil {
+		return models.CalendarPaneData{
+			Events: []models.Event{},
+			Count:  0,
+		}, err
+	}
+
+	return models.CalendarPaneData{
+		Events: events,
+		Count:  len(events),
 	}, nil
 }
