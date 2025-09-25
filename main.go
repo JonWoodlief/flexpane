@@ -97,7 +97,7 @@ func loadAppConfig() AppConfig {
 	defaultConfig := AppConfig{
 		Providers: map[string]providers.ProviderConfig{
 			"default": {
-				Type: "null",
+				Type: "mock",
 				Args: map[string]interface{}{},
 			},
 		},

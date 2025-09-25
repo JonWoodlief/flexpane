@@ -21,7 +21,6 @@ func NewProviderFactory() *ProviderFactory {
 	}
 	
 	// Register all available provider types
-	factory.RegisterProvider("null", factory.createNullProvider)
 	factory.RegisterProvider("mock", factory.createMockProvider)
 	
 	return factory
@@ -54,8 +53,4 @@ func (pf *ProviderFactory) GetAvailableProviders() []string {
 // Built-in provider constructors
 func (pf *ProviderFactory) createMockProvider(args map[string]interface{}) (DataProvider, error) {
 	return NewMockProvider(), nil
-}
-
-func (pf *ProviderFactory) createNullProvider(args map[string]interface{}) (DataProvider, error) {
-	return NewNullProvider(), nil
 }

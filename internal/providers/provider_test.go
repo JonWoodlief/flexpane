@@ -26,34 +26,12 @@ func TestMockProvider(t *testing.T) {
 	}
 }
 
-func TestNullProvider(t *testing.T) {
-	provider := NewNullProvider()
-
-	// Test calendar events (should be empty)
-	events, err := provider.GetCalendarEvents()
-	if err != nil {
-		t.Errorf("GetCalendarEvents failed: %v", err)
-	}
-	if len(events) != 0 {
-		t.Errorf("Expected 0 events from null provider, got %d", len(events))
-	}
-
-	// Test emails (should be empty)
-	emails, err := provider.GetEmails()
-	if err != nil {
-		t.Errorf("GetEmails failed: %v", err)
-	}
-	if len(emails) != 0 {
-		t.Errorf("Expected 0 emails from null provider, got %d", len(emails))
-	}
-}
-
 func TestProviderFactory(t *testing.T) {
 	factory := NewProviderFactory()
 
 	// Test that all providers are registered
 	available := factory.GetAvailableProviders()
-	expectedTypes := []string{"null", "mock"}
+	expectedTypes := []string{"mock"}
 	
 	for _, expected := range expectedTypes {
 		found := false
@@ -66,15 +44,6 @@ func TestProviderFactory(t *testing.T) {
 		if !found {
 			t.Errorf("Expected provider type '%s' to be available", expected)
 		}
-	}
-
-	// Test creating null provider
-	nullProvider, err := factory.CreateProvider(ProviderConfig{Type: "null"})
-	if err != nil {
-		t.Errorf("Failed to create null provider: %v", err)
-	}
-	if nullProvider == nil {
-		t.Error("Expected non-nil null provider")
 	}
 
 	// Test creating mock provider
@@ -94,7 +63,7 @@ func TestProviderFactory(t *testing.T) {
 
 	// Test custom provider registration
 	factory.RegisterProvider("custom", func(args map[string]interface{}) (DataProvider, error) {
-		return NewNullProvider(), nil
+		return NewMockProvider(), nil
 	})
 
 	customProvider, err := factory.CreateProvider(ProviderConfig{Type: "custom"})
