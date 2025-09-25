@@ -1,0 +1,14 @@
+{
+  "providers": {
+    "gmail": {
+      "type": "email",
+      "config": {
+        "api_key": "secret_gmail_key_12345"
+      }
+    },
+    "test-mock": {
+      "type": "mock"
+    }
+  },
+  "default": "test-mock"
+}

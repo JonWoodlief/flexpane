@@ -1,0 +1,11 @@
+{
+  "providers": {
+    "production-email": {
+      "type": "email",
+      "config": {
+        "api_key": "production_key_67890"
+      }
+    }
+  },
+  "default": "production-email"
+}
