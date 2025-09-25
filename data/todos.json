@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "done": true,
+    "message": "Test todo item"
+  },
+  {
+    "done": true,
+    "message": "Review security improvements"
+  }
+]

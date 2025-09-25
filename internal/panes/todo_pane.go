@@ -38,3 +38,13 @@ func (tp *TodoPane) GetData(ctx context.Context) (interface{}, error) {
 		"Count": len(todos),
 	}, nil
 }
+
+// AddTodo adds a new todo item
+func (tp *TodoPane) AddTodo(message string) error {
+	return tp.todoService.AddTodo(message)
+}
+
+// ToggleTodo toggles the done status of a todo item by index
+func (tp *TodoPane) ToggleTodo(index int) error {
+	return tp.todoService.ToggleTodo(index)
+}

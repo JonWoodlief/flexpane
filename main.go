@@ -94,11 +94,12 @@ func main() {
 	}
 	
 	server := &http.Server{
-		Addr:         ":" + port,
-		Handler:      nil,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		Addr:           ":" + port,
+		Handler:        nil,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		IdleTimeout:    120 * time.Second,
+		MaxHeaderBytes: 1 << 20, // 1 MB
 	}
 
 	// Start server in a goroutine

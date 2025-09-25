@@ -8,6 +8,10 @@ import (
 )
 
 // PaneRegistry manages all available panes
+// Thread safety: This registry is designed for single-threaded initialization
+// followed by read-only access during request handling. All panes are registered
+// during startup, and enabled/layout configuration is set once. The maps are
+// not modified during request processing, making concurrent reads safe.
 type PaneRegistry struct {
 	panes   map[string]models.Pane
 	enabled []string
