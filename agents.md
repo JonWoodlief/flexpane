@@ -21,9 +21,7 @@ go run main.go    # Starts server on :8080
 - **Configuration over hardcoding**
 
 ### Architecture - EXTENSIBLE Design
-- **Agents may be added or removed** - design interfaces accordingly
+- **Panes can be added** - design interfaces accordingly
 - **Provider pattern** for pluggable data sources
-- **Pane registry system** for modular UI components
 - **Server-side rendering** with Go templates
-- **Minimal JS** (progressive enhancement only)
 - Target: ~6-19ms page loads
