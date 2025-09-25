@@ -24,4 +24,3 @@ go run main.go    # Starts server on :8080
 - **Panes can be added** - design interfaces accordingly
 - **Provider pattern** for pluggable data sources
 - **Server-side rendering** with Go templates
-- Target: ~6-19ms page loads
