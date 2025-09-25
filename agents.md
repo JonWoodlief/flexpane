@@ -12,7 +12,6 @@ go run main.go    # Starts server on :8080
 
 ### Issue Tracking
 - Use TODO comments: `// TODO: DESCRIPTION - explain impact and solution`
-- Examples in: `internal/handlers/handler.go`
 
 ### Code Standards  
 - **Delete unused code** (don't comment out)
@@ -21,12 +20,10 @@ go run main.go    # Starts server on :8080
 - **Tests must add value** (remove interface-only tests)
 - **Configuration over hardcoding**
 
-### Architecture
-- Server-side rendering with Go templates
-- Provider pattern for mock → real API swapping
-- Minimal JS (progressive enhancement only)
+### Architecture - EXTENSIBLE Design
+- **Agents may be added or removed** - design interfaces accordingly
+- **Provider pattern** for pluggable data sources
+- **Pane registry system** for modular UI components
+- **Server-side rendering** with Go templates
+- **Minimal JS** (progressive enhancement only)
 - Target: ~6-19ms page loads
-
-## Data Models
-- **Todos**: `[{done: bool, message: string}]` 
-- **Mock providers**: `internal/services/mock_provider.go`
