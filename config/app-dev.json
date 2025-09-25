@@ -1,0 +1,50 @@
+{
+  "_comment": "Development configuration with mock providers for demo data",
+  "providers": {
+    "mock": {
+      "type": "mock",
+      "args": {}
+    },
+    "todos-file": {
+      "type": "file", 
+      "args": {
+        "todo_file": "data/todos.json"
+      }
+    }
+  },
+  "panes": {
+    "calendar": {
+      "type": "calendar",
+      "enabled": true,
+      "provider": "mock",
+      "layout": {
+        "grid_area": {
+          "row": "1",
+          "column": "span 3"
+        }
+      }
+    },
+    "todos": {
+      "type": "todos",
+      "enabled": true,
+      "provider": "todos-file",
+      "layout": {
+        "grid_area": {
+          "row": "2",
+          "column": "span 6"
+        }
+      }
+    },
+    "email": {
+      "type": "email",
+      "enabled": true,
+      "provider": "mock",
+      "layout": {
+        "grid_area": {
+          "row": "3",
+          "column": "span 3"
+        }
+      }
+    }
+  }
+}

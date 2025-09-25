@@ -11,6 +11,28 @@ The refactored architecture separates concerns into:
 - **Factories**: Registration and creation systems for providers and panes
 - **Configuration**: JSON-based configuration for enabling/configuring components
 
+## Understanding Providers
+
+A **provider** is a data source that implements our `Provider` interface. It fetches data from various sources:
+
+- **Production Providers**: Connect to real services (APIs, databases, files)
+  - `file`: File-based storage (todos from JSON, calendar/email disabled)
+  - `null`: Returns empty data (useful when integrations aren't configured)
+  
+- **Development Providers**: For testing and development
+  - `mock`: Returns fake demo data for all data types
+
+### Provider Types
+
+#### Production Providers (Always Available)
+- **`file`**: Composite provider using file storage for todos, null for calendar/email
+- **`null`**: Returns empty data for all types - used when integrations aren't set up
+
+#### Development Providers (Only Available When Needed)
+- **`mock`**: Returns realistic fake data for demos and development
+
+The factory automatically detects if mock providers are needed based on configuration and loads the appropriate factory.
+
 ## Adding a New Provider
 
 ### 1. Implement the Provider Interface
@@ -77,8 +99,8 @@ providerFactory.RegisterProvider("weather", func(args map[string]interface{}) (p
 
 ### 3. Configure the Provider
 
+#### Production Configuration (config/app.json)
 ```json
-// config/app.json
 {
   "providers": {
     "weather": {
@@ -91,6 +113,25 @@ providerFactory.RegisterProvider("weather", func(args map[string]interface{}) (p
   }
 }
 ```
+
+#### Development Configuration (config/app-dev.json)
+```json
+{
+  "providers": {
+    "mock": {
+      "type": "mock",
+      "args": {}
+    }
+  },
+  "panes": {
+    "calendar": {
+      "provider": "mock"
+    }
+  }
+}
+```
+
+**Note**: Mock providers are automatically available when referenced in configuration. The factory detects this and loads the development factory with mock support.
 
 ## Adding a New Pane Type
 

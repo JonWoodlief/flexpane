@@ -20,9 +20,19 @@ func NewProviderFactory() *ProviderFactory {
 		constructors: make(map[string]func(map[string]interface{}) (Provider, error)),
 	}
 	
-	// Register built-in providers
-	factory.RegisterProvider("mock", factory.createMockProvider)
+	// Register production providers only
 	factory.RegisterProvider("file", factory.createFileProvider)
+	factory.RegisterProvider("null", factory.createNullProvider)
+	
+	return factory
+}
+
+// NewProviderFactoryWithMocks creates a factory with mock providers for development/testing
+func NewProviderFactoryWithMocks() *ProviderFactory {
+	factory := NewProviderFactory()
+	
+	// Add mock providers for development/testing
+	factory.RegisterProvider("mock", factory.createMockProvider)
 	
 	return factory
 }
@@ -56,16 +66,21 @@ func (pf *ProviderFactory) createMockProvider(args map[string]interface{}) (Prov
 	return NewMockProvider(), nil
 }
 
+func (pf *ProviderFactory) createNullProvider(args map[string]interface{}) (Provider, error) {
+	return NewNullProvider(), nil
+}
+
 func (pf *ProviderFactory) createFileProvider(args map[string]interface{}) (Provider, error) {
-	// For file provider, we create a composite provider that uses MockProvider for calendar/email
-	// and TodoFileProvider for todos
+	// For file provider, we create a composite provider that uses NullProvider for calendar/email
+	// and TodoFileProvider for todos. This is appropriate for production when real calendar/email
+	// integrations aren't configured yet.
 	todoFilename, ok := args["todo_file"].(string)
 	if !ok {
 		todoFilename = "data/todos.json" // default
 	}
 	
 	return NewCompositeProvider(
-		NewMockProvider(),           // For calendar and email
+		NewNullProvider(),              // For calendar and email - no fake data in production
 		NewTodoFileProvider(todoFilename), // For todos
 	), nil
 }

@@ -20,17 +20,33 @@ type AppConfig struct {
 }
 
 func main() {
-	// Initialize factories
-	providerFactory := providers.NewProviderFactory()
+	// Initialize factories - use development factory if mock providers are needed
+	var providerFactory *providers.ProviderFactory
+	config := loadAppConfig()
+	
+	// Check if configuration requires mock providers
+	needsMockProviders := false
+	for _, providerConfig := range config.Providers {
+		if providerConfig.Type == "mock" {
+			needsMockProviders = true
+			break
+		}
+	}
+	
+	if needsMockProviders {
+		providerFactory = providers.NewProviderFactoryWithMocks()
+		log.Println("Using development factory with mock providers")
+	} else {
+		providerFactory = providers.NewProviderFactory()
+		log.Println("Using production factory")
+	}
+	
 	paneFactory := services.NewPaneFactory()
 
 	// Parse templates - include all template files
 	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
 	tmpl = template.Must(tmpl.ParseGlob("web/templates/components/*.html"))
 	tmpl = template.Must(tmpl.ParseGlob("web/templates/panes/*.html"))
-
-	// Load application configuration
-	config := loadAppConfig()
 
 	// Create providers based on configuration
 	for name, providerConfig := range config.Providers {
