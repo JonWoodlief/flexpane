@@ -20,17 +20,8 @@ func NewProviderFactory() *ProviderFactory {
 		constructors: make(map[string]func(map[string]interface{}) (DataProvider, error)),
 	}
 	
-	// Register email/calendar providers only
+	// Register all available provider types
 	factory.RegisterProvider("null", factory.createNullProvider)
-	
-	return factory
-}
-
-// NewProviderFactoryWithMocks creates a factory with mock providers for development/testing
-func NewProviderFactoryWithMocks() *ProviderFactory {
-	factory := NewProviderFactory()
-	
-	// Add mock providers for development/testing
 	factory.RegisterProvider("mock", factory.createMockProvider)
 	
 	return factory

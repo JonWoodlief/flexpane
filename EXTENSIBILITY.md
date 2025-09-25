@@ -13,25 +13,25 @@ The refactored architecture separates concerns into:
 
 ## Understanding Providers
 
-A **provider** is a data source that implements our `Provider` interface. It fetches data from various sources:
+A **provider** is a data source that implements our `DataProvider` interface. It fetches data from various sources:
 
 - **Production Providers**: Connect to real services (APIs, databases, files)
-  - `file`: File-based storage (todos from JSON, calendar/email disabled)
   - `null`: Returns empty data (useful when integrations aren't configured)
+  - Custom providers like `outlook`, `gmail` for real integrations
   
 - **Development Providers**: For testing and development
   - `mock`: Returns fake demo data for all data types
 
 ### Provider Types
 
-#### Production Providers (Always Available)
-- **`file`**: Composite provider using file storage for todos, null for calendar/email
+All provider types are available through the standard factory - no special handling needed. Simply configure the provider type in your JSON configuration.
+
+#### Available Providers
 - **`null`**: Returns empty data for all types - used when integrations aren't set up
-
-#### Development Providers (Only Available When Needed)
 - **`mock`**: Returns realistic fake data for demos and development
+- **Custom providers**: Add your own by registering with the factory
 
-The factory automatically detects if mock providers are needed based on configuration and loads the appropriate factory.
+Providers are configured purely through JSON - no code changes required to switch between production and development modes.
 
 ## Adding a New Provider
 

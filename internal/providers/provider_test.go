@@ -51,9 +51,9 @@ func TestNullProvider(t *testing.T) {
 func TestProviderFactory(t *testing.T) {
 	factory := NewProviderFactory()
 
-	// Test that production providers are registered (no mock)
+	// Test that all providers are registered
 	available := factory.GetAvailableProviders()
-	expectedTypes := []string{"null"}
+	expectedTypes := []string{"null", "mock"}
 	
 	for _, expected := range expectedTypes {
 		found := false
@@ -68,13 +68,6 @@ func TestProviderFactory(t *testing.T) {
 		}
 	}
 
-	// Test that mock is NOT available in production factory
-	for _, available := range available {
-		if available == "mock" {
-			t.Error("Mock provider should not be available in production factory")
-		}
-	}
-
 	// Test creating null provider
 	nullProvider, err := factory.CreateProvider(ProviderConfig{Type: "null"})
 	if err != nil {
@@ -84,16 +77,19 @@ func TestProviderFactory(t *testing.T) {
 		t.Error("Expected non-nil null provider")
 	}
 
+	// Test creating mock provider
+	mockProvider, err := factory.CreateProvider(ProviderConfig{Type: "mock"})
+	if err != nil {
+		t.Errorf("Failed to create mock provider: %v", err)
+	}
+	if mockProvider == nil {
+		t.Error("Expected non-nil mock provider")
+	}
+
 	// Test creating unknown provider
 	_, err = factory.CreateProvider(ProviderConfig{Type: "unknown"})
 	if err == nil {
 		t.Error("Expected error when creating unknown provider type")
-	}
-
-	// Test creating mock provider should fail in production factory
-	_, err = factory.CreateProvider(ProviderConfig{Type: "mock"})
-	if err == nil {
-		t.Error("Expected error when creating mock provider in production factory")
 	}
 
 	// Test custom provider registration
@@ -107,35 +103,5 @@ func TestProviderFactory(t *testing.T) {
 	}
 	if customProvider == nil {
 		t.Error("Expected non-nil custom provider")
-	}
-}
-
-func TestProviderFactoryWithMocks(t *testing.T) {
-	factory := NewProviderFactoryWithMocks()
-
-	// Test that both production and mock providers are available
-	available := factory.GetAvailableProviders()
-	expectedTypes := []string{"null", "mock"}
-	
-	for _, expected := range expectedTypes {
-		found := false
-		for _, available := range available {
-			if available == expected {
-				found = true
-				break
-			}
-		}
-		if !found {
-			t.Errorf("Expected provider type '%s' to be available in development factory", expected)
-		}
-	}
-
-	// Test creating mock provider in development factory
-	mockProvider, err := factory.CreateProvider(ProviderConfig{Type: "mock"})
-	if err != nil {
-		t.Errorf("Failed to create mock provider in development factory: %v", err)
-	}
-	if mockProvider == nil {
-		t.Error("Expected non-nil mock provider")
 	}
 }

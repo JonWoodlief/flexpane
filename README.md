@@ -18,11 +18,10 @@ The app uses JSON configuration files:
 
 ### Provider Types
 
-- **`file`**: File-based storage (todos from JSON, calendar/email disabled)
 - **`null`**: Empty data provider (for when integrations aren't configured)
-- **`mock`**: Demo data provider (automatically enabled in development)
+- **`mock`**: Demo data provider (for development and testing)
 
-The app automatically detects if mock providers are needed and switches to development mode.
+All provider types are available and configured purely through JSON files - no special handling needed.
 
 ## Documentation
 

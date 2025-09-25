@@ -26,26 +26,8 @@ func main() {
 	// Initialize todo service (independent of provider system)
 	todoService := services.NewTodoService("data/todos.json")
 	
-	// Initialize factories - use development factory if mock providers are needed
-	var providerFactory *providers.ProviderFactory
-	
-	// Check if configuration requires mock providers
-	needsMockProviders := false
-	for _, providerConfig := range config.Providers {
-		if providerConfig.Type == "mock" {
-			needsMockProviders = true
-			break
-		}
-	}
-	
-	if needsMockProviders {
-		providerFactory = providers.NewProviderFactoryWithMocks()
-		log.Println("Using development factory with mock providers")
-	} else {
-		providerFactory = providers.NewProviderFactory()
-		log.Println("Using production factory")
-	}
-	
+	// Initialize factories
+	providerFactory := providers.NewProviderFactory()
 	paneFactory := services.NewPaneFactory(todoService)
 
 	// Parse templates - include all template files
