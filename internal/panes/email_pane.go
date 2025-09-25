@@ -7,7 +7,8 @@ import (
 	"flexplane/internal/providers"
 )
 
-// EmailPane implements the Pane interface for email messages
+// EmailPane implements both Pane and TypedPane interfaces for email messages
+// The generic TypedPane provides compile-time type safety for the EmailPaneData
 type EmailPane struct {
 	provider providers.DataProvider
 }
@@ -26,22 +27,28 @@ func (ep *EmailPane) Title() string {
 	return "Email Preview"
 }
 
-
 func (ep *EmailPane) Template() string {
 	return "panes/email.html"
 }
 
+// GetData maintains backward compatibility by returning interface{}
 func (ep *EmailPane) GetData(ctx context.Context) (interface{}, error) {
+	return ep.GetTypedData(ctx)
+}
+
+// GetTypedData provides type-safe access to email data
+// This eliminates the need for type assertions in calling code
+func (ep *EmailPane) GetTypedData(ctx context.Context) (models.EmailPaneData, error) {
 	emails, err := ep.provider.GetEmails()
 	if err != nil {
-		return map[string]interface{}{
-			"Emails": []models.Email{},
-			"Count":  0,
+		return models.EmailPaneData{
+			Emails: []models.Email{},
+			Count:  0,
 		}, err
 	}
 
-	return map[string]interface{}{
-		"Emails": emails,
-		"Count":  len(emails),
+	return models.EmailPaneData{
+		Emails: emails,
+		Count:  len(emails),
 	}, nil
 }

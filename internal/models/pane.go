@@ -29,9 +29,22 @@ type Pane interface {
 	Template() string
 }
 
+// TypedPane provides type-safe data access for panes
+// This generic interface eliminates the need for type assertions
+// and provides compile-time type safety for pane data
+type TypedPane[T any] interface {
+	Pane
+	GetTypedData(ctx context.Context) (T, error)
+}
+
 // APIHandler interface for panes that need API endpoints
 type APIHandler interface {
 	HandleAPI(w http.ResponseWriter, r *http.Request) error
+}
+
+// TypedAPIHandler provides type-safe API handling with generic request/response types
+type TypedAPIHandler[TReq, TResp any] interface {
+	HandleTypedAPI(ctx context.Context, req TReq) (TResp, error)
 }
 
 // PaneData holds the rendered data for a pane
@@ -64,6 +77,27 @@ type Email struct {
 	Preview string    `json:"preview"`
 	Time    time.Time `json:"time"`
 	Read    bool      `json:"read"`
+}
+
+// Typed data structures for generic panes
+type TodoPaneData struct {
+	Todos []Todo `json:"Todos"`
+	Count int    `json:"Count"`
+}
+
+type CalendarPaneData struct {
+	Events []Event `json:"Events"`
+	Count  int     `json:"Count"`
+}
+
+type EmailPaneData struct {
+	Emails []Email `json:"Emails"`
+	Count  int     `json:"Count"`
+}
+
+// Generic provider interface for type-safe data access
+type DataProvider[T any] interface {
+	GetData() (T, error)
 }
 
 // PageData contains all data for the main page

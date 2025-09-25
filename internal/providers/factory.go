@@ -30,6 +30,44 @@ type ProviderFactory struct {
 	config DataProviderConfig
 }
 
+// GenericProviderFactory provides type-safe provider creation
+// T represents the data type the provider will return
+type GenericProviderFactory[T any] struct {
+	*ProviderFactory
+	createFunc func(ProviderConfig) (T, error)
+}
+
+// NewGenericProviderFactory creates a type-safe provider factory
+// This eliminates the need for type assertions when creating providers
+func NewGenericProviderFactory[T any](configPath string, createFunc func(ProviderConfig) (T, error)) (*GenericProviderFactory[T], error) {
+	factory, err := NewProviderFactory(configPath)
+	if err != nil {
+		return nil, err
+	}
+	
+	return &GenericProviderFactory[T]{
+		ProviderFactory: factory,
+		createFunc:      createFunc,
+	}, nil
+}
+
+// CreateTypedProvider creates a provider with compile-time type safety
+func (gf *GenericProviderFactory[T]) CreateTypedProvider(name string) (T, error) {
+	var zero T
+	providerConfig, exists := gf.config.Providers[name]
+	if !exists {
+		if gf.config.Default == "" {
+			return zero, fmt.Errorf("provider '%s' not found and no default configured", name)
+		}
+		providerConfig, exists = gf.config.Providers[gf.config.Default]
+		if !exists {
+			return zero, fmt.Errorf("default provider '%s' not found", gf.config.Default)
+		}
+	}
+	
+	return gf.createFunc(providerConfig)
+}
+
 // NewProviderFactory creates a new provider factory from configuration file
 func NewProviderFactory(configPath string) (*ProviderFactory, error) {
 	configData, err := os.ReadFile(configPath)

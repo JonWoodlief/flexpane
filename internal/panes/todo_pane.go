@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"flexplane/internal/models"
 	"flexplane/internal/services"
 )
 
-// TodoPane implements the Pane interface for todo items
+// TodoPane implements both Pane and TypedPane interfaces for todo items
+// The generic TypedPane provides compile-time type safety for the TodoPaneData
 type TodoPane struct {
 	todoService *services.TodoService
 }
@@ -28,17 +30,23 @@ func (tp *TodoPane) Title() string {
 	return "Todos"
 }
 
-
 func (tp *TodoPane) Template() string {
 	return "panes/todos.html"
 }
 
+// GetData maintains backward compatibility by returning interface{}
 func (tp *TodoPane) GetData(ctx context.Context) (interface{}, error) {
+	return tp.GetTypedData(ctx)
+}
+
+// GetTypedData provides type-safe access to todo data
+// This eliminates the need for type assertions in calling code
+func (tp *TodoPane) GetTypedData(ctx context.Context) (models.TodoPaneData, error) {
 	todos := tp.todoService.GetTodos()
 
-	return map[string]interface{}{
-		"Todos": todos,
-		"Count": len(todos),
+	return models.TodoPaneData{
+		Todos: todos,
+		Count: len(todos),
 	}, nil
 }
 
