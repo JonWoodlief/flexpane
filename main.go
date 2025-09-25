@@ -10,6 +10,7 @@ import (
 
 	"flexplane/internal/handlers"
 	"flexplane/internal/panes"
+	"flexplane/internal/providers"
 	"flexplane/internal/services"
 )
 
@@ -21,7 +22,18 @@ type PaneConfig struct {
 func main() {
 	// Initialize services
 	todoService := services.NewTodoService("data/todos.json")
-	mockProvider := services.NewMockProvider()
+
+	// Initialize provider factory
+	providerFactory, err := providers.NewProviderFactory("config/providers.json")
+	if err != nil {
+		log.Fatalf("Failed to create provider factory: %v", err)
+	}
+
+	// Get default data provider
+	dataProvider, err := providerFactory.GetDefaultProvider()
+	if err != nil {
+		log.Fatalf("Failed to create default provider: %v", err)
+	}
 
 	// Parse templates - include all template files
 	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
@@ -32,9 +44,9 @@ func main() {
 	registry := services.NewPaneRegistry()
 
 	// Register available panes
-	registry.RegisterPane(panes.NewCalendarPane(mockProvider))
+	registry.RegisterPane(panes.NewCalendarPane(dataProvider))
 	registry.RegisterPane(panes.NewTodoPane(todoService))
-	registry.RegisterPane(panes.NewEmailPane(mockProvider))
+	registry.RegisterPane(panes.NewEmailPane(dataProvider))
 
 	// Load pane configuration
 	defaultPanes := []string{"calendar", "todos", "email"}

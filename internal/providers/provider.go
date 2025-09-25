@@ -9,7 +9,3 @@ type DataProvider interface {
 }
 
 // This interface allows easy swapping between mock and real providers
-// For example:
-// - MockProvider (current implementation)
-// - OutlookProvider (future Microsoft Graph API integration)
-// - GmailProvider (future Gmail API integration)

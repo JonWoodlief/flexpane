@@ -1,0 +1,8 @@
+{
+  "default": "mock",
+  "providers": {
+    "mock": {
+      "type": "mock"
+    }
+  }
+}

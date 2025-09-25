@@ -11,6 +11,7 @@ import (
 
 	"flexplane/internal/handlers"
 	"flexplane/internal/panes"
+	"flexplane/internal/providers"
 	"flexplane/internal/services"
 )
 
@@ -18,13 +19,23 @@ import (
 func TestFullApplication_HomePage(t *testing.T) {
 	// Setup full application like main.go
 	todoService := services.NewTodoService("test_integration_todos.json")
-	mockProvider := services.NewMockProvider()
+
+	// Use provider factory like main.go
+	providerFactory, err := providers.NewProviderFactory("config/providers.json")
+	if err != nil {
+		t.Fatalf("Failed to create provider factory: %v", err)
+	}
+
+	dataProvider, err := providerFactory.GetDefaultProvider()
+	if err != nil {
+		t.Fatalf("Failed to create default provider: %v", err)
+	}
 
 	// Create registry
 	registry := services.NewPaneRegistry()
-	registry.RegisterPane(panes.NewCalendarPane(mockProvider))
+	registry.RegisterPane(panes.NewCalendarPane(dataProvider))
 	registry.RegisterPane(panes.NewTodoPane(todoService))
-	registry.RegisterPane(panes.NewEmailPane(mockProvider))
+	registry.RegisterPane(panes.NewEmailPane(dataProvider))
 	registry.SetEnabledPanes([]string{"calendar", "todos", "email"})
 
 	// Use real templates (this will help catch template errors)
