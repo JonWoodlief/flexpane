@@ -38,6 +38,7 @@ func (f *ProviderFactory) CreateAuthenticatedProvider() AuthenticatedProvider {
 	clientID := os.Getenv("GOOGLE_CLIENT_ID")
 	
 	if clientID != "" {
+		log.Println("Google OAuth configured - using Gmail provider")
 		return NewGmailProvider()
 	}
 
