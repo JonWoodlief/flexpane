@@ -1,4 +1,4 @@
-# Flexplane
+# Flexpane
 
 Personal productivity app with extensible panes (calendar, todos, email).
 

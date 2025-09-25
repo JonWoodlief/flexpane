@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"flexplane/internal/models"
-	"flexplane/internal/providers"
-	"flexplane/internal/services"
+	"flexpane/internal/models"
+	"flexpane/internal/providers"
+	"flexpane/internal/services"
 )
 
 // TestTypedPaneInterfaces demonstrates the advantages of generic type-safe interfaces

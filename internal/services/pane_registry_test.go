@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"flexplane/internal/models"
+	"flexpane/internal/models"
 )
 
 // MockPane for testing

@@ -5,8 +5,8 @@ import (
 	"html/template"
 	"net/http"
 
-	"flexplane/internal/models"
-	"flexplane/internal/services"
+	"flexpane/internal/models"
+	"flexpane/internal/services"
 )
 
 type Handler struct {

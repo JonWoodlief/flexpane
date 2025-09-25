@@ -8,10 +8,10 @@ import (
 	"os"
 	"time"
 
-	"flexplane/internal/handlers"
-	"flexplane/internal/panes"
-	"flexplane/internal/providers"
-	"flexplane/internal/services"
+	"flexpane/internal/handlers"
+	"flexpane/internal/panes"
+	"flexpane/internal/providers"
+	"flexpane/internal/services"
 )
 
 type PaneConfig struct {
@@ -23,16 +23,10 @@ func main() {
 	// Initialize services
 	todoService := services.NewTodoService("data/todos.json")
 
-	// Initialize provider factory
-	providerFactory, err := providers.NewProviderFactory("config/providers.json")
+	// Create data provider
+	dataProvider, err := providers.CreateProvider("mock")
 	if err != nil {
-		log.Fatalf("Failed to create provider factory: %v", err)
-	}
-
-	// Get default data provider
-	dataProvider, err := providerFactory.GetDefaultProvider()
-	if err != nil {
-		log.Fatalf("Failed to create default provider: %v", err)
+		log.Fatalf("Failed to create provider: %v", err)
 	}
 
 	// Parse templates - include all template files
@@ -82,6 +76,6 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	log.Println("Flexplane (extensible panes) server starting on :3000")
+	log.Println("Flexpane (extensible panes) server starting on :3000")
 	log.Fatal(server.ListenAndServe())
 }

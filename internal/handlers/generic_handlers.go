@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"flexplane/internal/models"
+	"flexpane/internal/models"
 )
 
 // GenericAPIHandler provides type-safe API handling with compile-time guarantees

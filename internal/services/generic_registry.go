@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"flexplane/internal/models"
+	"flexpane/internal/models"
 )
 
 // TypedPaneRegistry provides type-safe pane registration and retrieval

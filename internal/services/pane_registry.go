@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"flexplane/internal/models"
+	"flexpane/internal/models"
 )
 
 // PaneRegistry manages all available panes

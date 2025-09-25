@@ -8,9 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"flexplane/internal/models"
-	"flexplane/internal/panes"
-	"flexplane/internal/providers"
+	"flexpane/internal/models"
+	"flexpane/internal/panes"
+	"flexpane/internal/providers"
 )
 
 // TestGenericAPIHandler demonstrates the advantages of type-safe API handlers

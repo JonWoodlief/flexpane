@@ -1,6 +1,6 @@
 package providers
 
-import "flexplane/internal/models"
+import "flexpane/internal/models"
 
 // DataProvider defines the interface for calendar and email data sources
 type DataProvider interface {

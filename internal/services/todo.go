@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"flexplane/internal/models"
+	"flexpane/internal/models"
 )
 
 type TodoService struct {

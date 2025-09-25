@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"flexplane/internal/models"
-	"flexplane/internal/panes"
-	"flexplane/internal/providers"
-	"flexplane/internal/services"
+	"flexpane/internal/models"
+	"flexpane/internal/panes"
+	"flexpane/internal/providers"
+	"flexpane/internal/services"
 )
 
 // TestTypedPaneRegistry demonstrates type-safe pane registration and retrieval

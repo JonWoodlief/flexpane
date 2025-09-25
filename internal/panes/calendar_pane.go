@@ -3,8 +3,8 @@ package panes
 import (
 	"context"
 
-	"flexplane/internal/models"
-	"flexplane/internal/providers"
+	"flexpane/internal/models"
+	"flexpane/internal/providers"
 )
 
 // CalendarPane implements both Pane and TypedPane interfaces for calendar events
