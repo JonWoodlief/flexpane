@@ -1,26 +1,2 @@
-# Binaries
+# Binary
 flexplane
-*.exe
-
-# Build artifacts
-/dist/
-/build/
-
-# Dependencies
-node_modules/
-
-# Test artifacts
-*.test
-coverage.out
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE files
-.vscode/
-.idea/
-
-# Temporary files
-/tmp/
-*.tmp
