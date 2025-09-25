@@ -3,6 +3,15 @@
   "providers": {
     "mock": {
       "type": "mock"
+    },
+    "gmail": {
+      "type": "gmail",
+      "config": {
+        "client_id": "your-client-id.googleusercontent.com",
+        "client_secret": "your-client-secret",
+        "access_token": "your-access-token",
+        "refresh_token": "your-refresh-token"
+      }
     }
   }
 }

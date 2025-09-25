@@ -10,7 +10,8 @@ import (
 type ProviderType string
 
 const (
-	ProviderTypeMock ProviderType = "mock"
+	ProviderTypeMock  ProviderType = "mock"
+	ProviderTypeGmail ProviderType = "gmail"
 )
 
 // ProviderConfig holds configuration for data providers
@@ -62,6 +63,8 @@ func (f *ProviderFactory) CreateProvider(name string) (DataProvider, error) {
 	switch providerConfig.Type {
 	case ProviderTypeMock:
 		return f.createMockProvider(providerConfig.Config)
+	case ProviderTypeGmail:
+		return f.createGmailProvider(providerConfig.Config)
 	default:
 		return nil, fmt.Errorf("unsupported provider type: %s", providerConfig.Type)
 	}
@@ -78,4 +81,31 @@ func (f *ProviderFactory) GetDefaultProvider() (DataProvider, error) {
 // createMockProvider creates a mock provider (no configuration needed)
 func (f *ProviderFactory) createMockProvider(_ map[string]interface{}) (DataProvider, error) {
 	return NewMockProvider(), nil
+}
+
+// createGmailProvider creates a Gmail provider from configuration
+func (f *ProviderFactory) createGmailProvider(config map[string]interface{}) (DataProvider, error) {
+	// Convert map to GmailConfig struct
+	var gmailConfig GmailConfig
+	
+	if clientID, ok := config["client_id"].(string); ok {
+		gmailConfig.ClientID = clientID
+	}
+	if clientSecret, ok := config["client_secret"].(string); ok {
+		gmailConfig.ClientSecret = clientSecret
+	}
+	if accessToken, ok := config["access_token"].(string); ok {
+		gmailConfig.AccessToken = accessToken
+	}
+	if refreshToken, ok := config["refresh_token"].(string); ok {
+		gmailConfig.RefreshToken = refreshToken
+	}
+	if credentialsPath, ok := config["credentials_path"].(string); ok {
+		gmailConfig.CredentialsPath = credentialsPath
+	}
+	if tokenPath, ok := config["token_path"].(string); ok {
+		gmailConfig.TokenPath = tokenPath
+	}
+	
+	return NewGmailProvider(gmailConfig)
 }
