@@ -68,7 +68,7 @@ func setupTestHandler(t *testing.T) *Handler {
 		},
 	})
 
-	return NewHandler(registry, tmpl)
+	return NewHandler(registry, tmpl, nil) // Use nil for tests since we're using mock provider
 }
 
 func TestHandler_Home_Success(t *testing.T) {
@@ -136,7 +136,7 @@ func TestHandler_TodosAPI_WithTodosPane(t *testing.T) {
 		},
 	})
 
-	handler := NewHandler(registry, tmpl)
+	handler := NewHandler(registry, tmpl, nil)
 
 	req := httptest.NewRequest("GET", "/api/todos", nil)
 	recorder := httptest.NewRecorder()
@@ -171,7 +171,7 @@ func TestHandler_TodosAPI_MethodNotAllowed(t *testing.T) {
 		},
 	})
 
-	handler := NewHandler(registry, tmpl)
+	handler := NewHandler(registry, tmpl, nil)
 
 	req := httptest.NewRequest("DELETE", "/api/todos", nil)
 	recorder := httptest.NewRecorder()

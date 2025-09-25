@@ -10,6 +10,7 @@ import (
 
 	"flexplane/internal/handlers"
 	"flexplane/internal/panes"
+	"flexplane/internal/providers"
 	"flexplane/internal/services"
 )
 
@@ -21,7 +22,20 @@ type PaneConfig struct {
 func main() {
 	// Initialize services
 	todoService := services.NewTodoService("data/todos.json")
-	mockProvider := services.NewMockProvider()
+	
+	// Create provider factory
+	factory := providers.NewProviderFactory()
+	
+	// Try to create authenticated provider (Gmail) first, fall back to regular provider
+	var provider providers.DataProvider
+	var gmailProvider *providers.GmailProvider
+	
+	if authProvider := factory.CreateAuthenticatedProvider(); authProvider != nil {
+		gmailProvider = authProvider.(*providers.GmailProvider)
+		provider = authProvider
+	} else {
+		provider = factory.CreateProvider()
+	}
 
 	// Parse templates - include all template files
 	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
@@ -32,9 +46,9 @@ func main() {
 	registry := services.NewPaneRegistry()
 
 	// Register available panes
-	registry.RegisterPane(panes.NewCalendarPane(mockProvider))
+	registry.RegisterPane(panes.NewCalendarPane(provider))
 	registry.RegisterPane(panes.NewTodoPane(todoService))
-	registry.RegisterPane(panes.NewEmailPane(mockProvider))
+	registry.RegisterPane(panes.NewEmailPane(provider))
 
 	// Load pane configuration
 	configData, err := os.ReadFile("config/panes.json")
@@ -53,10 +67,13 @@ func main() {
 	}
 
 	// Initialize handlers
-	handler := handlers.NewHandler(registry, tmpl)
+	handler := handlers.NewHandler(registry, tmpl, gmailProvider)
 
 	// Routes
 	http.HandleFunc("/", handler.Home)
+	if gmailProvider != nil {
+		http.HandleFunc("/auth/callback", handler.AuthCallback)
+	}
 	http.HandleFunc("/api/todos", handler.TodosAPI)
 	// TODO: Add pane-specific API endpoints
 

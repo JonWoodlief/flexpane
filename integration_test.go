@@ -33,7 +33,7 @@ func TestFullApplication_HomePage(t *testing.T) {
 		t.Skipf("Skipping integration test - templates not available: %v", err)
 	}
 
-	handler := handlers.NewHandler(registry, templates)
+	handler := handlers.NewHandler(registry, templates, nil)
 
 	// Test home page
 	req := httptest.NewRequest("GET", "/", nil)
@@ -75,7 +75,7 @@ func TestFullApplication_TodosAPI(t *testing.T) {
 		t.Skipf("Skipping integration test - templates not available: %v", err)
 	}
 
-	handler := handlers.NewHandler(registry, templates)
+	handler := handlers.NewHandler(registry, templates, nil)
 
 	// Test GET /api/todos
 	req := httptest.NewRequest("GET", "/api/todos", nil)
