@@ -14,7 +14,7 @@ go run main.go    # Starts server on :8080
 - Use TODO comments: `// TODO: DESCRIPTION - explain impact and solution`
 
 ### Code Standards  
-- **Delete unused code** (don't comment out)
+- **Delete all unused code. Do not leave deprecated code or stubs
 - **No versioned files** (`handler_v2.go`, etc.)
 - **Prefer simplicity** over complex solutions
 - **Tests must add value** (remove interface-only tests)
