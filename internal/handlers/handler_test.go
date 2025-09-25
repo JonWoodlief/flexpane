@@ -9,6 +9,7 @@ import (
 
 	"flexplane/internal/models"
 	"flexplane/internal/panes"
+	"flexplane/internal/providers"
 	"flexplane/internal/services"
 )
 
@@ -125,8 +126,8 @@ func TestHandler_TodosAPI_WithTodosPane(t *testing.T) {
 	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
 
 	registry := services.NewPaneRegistry()
-	todoService := services.NewTodoService("test_todos.json")
-	registry.RegisterPane(panes.NewTodoPane(todoService))
+	todoProvider := providers.NewTodoFileProvider("test_todos.json")
+	registry.RegisterPane(panes.NewTodoPane(todoProvider))
 	registry.SetEnabledPanes([]string{"todos"})
 
 	// Set layout config
@@ -160,8 +161,8 @@ func TestHandler_TodosAPI_MethodNotAllowed(t *testing.T) {
 	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
 
 	registry := services.NewPaneRegistry()
-	todoService := services.NewTodoService("test_method_not_allowed.json")
-	registry.RegisterPane(panes.NewTodoPane(todoService))
+	todoProvider := providers.NewTodoFileProvider("test_method_not_allowed.json")
+	registry.RegisterPane(panes.NewTodoPane(todoProvider))
 	registry.SetEnabledPanes([]string{"todos"})
 
 	// Set layout config
@@ -180,6 +181,77 @@ func TestHandler_TodosAPI_MethodNotAllowed(t *testing.T) {
 
 	if recorder.Code != http.StatusMethodNotAllowed {
 		t.Errorf("Expected status 405, got %d", recorder.Code)
+	}
+}
+
+func TestHandler_PaneAPI_Success(t *testing.T) {
+	// Setup handler with todos pane
+	tmpl := template.New("test")
+	layoutTemplate := `<div>{{range .Panes}}{{.Title}}{{end}}</div>`
+	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
+
+	registry := services.NewPaneRegistry()
+	todoProvider := providers.NewTodoFileProvider("test_pane_api.json")
+	registry.RegisterPane(panes.NewTodoPane(todoProvider))
+	registry.SetEnabledPanes([]string{"todos"})
+
+	// Set layout config
+	registry.SetLayoutConfig(map[string]services.PaneLayoutConfig{
+		"todos": {
+			GridArea: models.PaneGridArea{Row: "2", Column: "span 6"},
+		},
+	})
+
+	handler := NewHandler(registry, tmpl)
+
+	req := httptest.NewRequest("GET", "/api/todos", nil)
+	recorder := httptest.NewRecorder()
+
+	handler.PaneAPI(recorder, req)
+
+	if recorder.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", recorder.Code)
+	}
+
+	contentType := recorder.Header().Get("Content-Type")
+	if contentType != "application/json" {
+		t.Errorf("Expected JSON content type, got %s", contentType)
+	}
+}
+
+func TestHandler_PaneAPI_PaneNotFound(t *testing.T) {
+	tmpl := template.New("test")
+	layoutTemplate := `<div>test</div>`
+	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
+
+	registry := services.NewPaneRegistry()
+	handler := NewHandler(registry, tmpl)
+
+	req := httptest.NewRequest("GET", "/api/nonexistent", nil)
+	recorder := httptest.NewRecorder()
+
+	handler.PaneAPI(recorder, req)
+
+	if recorder.Code != http.StatusNotFound {
+		t.Errorf("Expected status 404, got %d", recorder.Code)
+	}
+}
+
+func TestHandler_PaneAPI_InvalidPath(t *testing.T) {
+	tmpl := template.New("test")
+	layoutTemplate := `<div>test</div>`
+	tmpl = template.Must(tmpl.New("layout.html").Parse(layoutTemplate))
+
+	registry := services.NewPaneRegistry()
+	handler := NewHandler(registry, tmpl)
+
+	req := httptest.NewRequest("GET", "/invalid/path", nil)
+	recorder := httptest.NewRecorder()
+
+	handler.PaneAPI(recorder, req)
+
+	if recorder.Code != http.StatusBadRequest {
+		t.Errorf("Expected status 400, got %d", recorder.Code)
 	}
 }
 

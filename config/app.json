@@ -1,0 +1,49 @@
+{
+  "providers": {
+    "default": {
+      "type": "file",
+      "args": {
+        "todo_file": "data/todos.json"
+      }
+    },
+    "mock": {
+      "type": "mock",
+      "args": {}
+    }
+  },
+  "panes": {
+    "calendar": {
+      "type": "calendar",
+      "enabled": true,
+      "provider": "default",
+      "layout": {
+        "grid_area": {
+          "row": "1",
+          "column": "span 3"
+        }
+      }
+    },
+    "todos": {
+      "type": "todos",
+      "enabled": true,
+      "provider": "default",
+      "layout": {
+        "grid_area": {
+          "row": "2",
+          "column": "span 6"
+        }
+      }
+    },
+    "email": {
+      "type": "email",
+      "enabled": true,
+      "provider": "default",
+      "layout": {
+        "grid_area": {
+          "row": "3",
+          "column": "span 3"
+        }
+      }
+    }
+  }
+}

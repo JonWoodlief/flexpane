@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"net/http"
+	"strings"
 
 	"flexplane/internal/models"
 	"flexplane/internal/services"
@@ -49,6 +50,19 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 // multi-user support or background sync.
 func (h *Handler) TodosAPI(w http.ResponseWriter, r *http.Request) {
 	h.handlePaneAPI("todos", w, r)
+}
+
+// PaneAPI provides a generic API handler for any pane by ID
+func (h *Handler) PaneAPI(w http.ResponseWriter, r *http.Request) {
+	// Extract pane ID from URL path - expecting /api/{paneID}
+	pathParts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+	if len(pathParts) < 2 || pathParts[0] != "api" {
+		http.Error(w, "Invalid API path", 400)
+		return
+	}
+	
+	paneID := pathParts[1]
+	h.handlePaneAPI(paneID, w, r)
 }
 
 // handlePaneAPI provides a generic API handler for panes that implement APIHandler

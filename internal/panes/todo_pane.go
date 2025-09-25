@@ -6,17 +6,17 @@ import (
 	"net/http"
 	"strconv"
 
-	"flexplane/internal/services"
+	"flexplane/internal/providers"
 )
 
 // TodoPane implements the Pane interface for todo items
 type TodoPane struct {
-	todoService *services.TodoService
+	todoProvider providers.TodoProvider
 }
 
-func NewTodoPane(todoService *services.TodoService) *TodoPane {
+func NewTodoPane(todoProvider providers.TodoProvider) *TodoPane {
 	return &TodoPane{
-		todoService: todoService,
+		todoProvider: todoProvider,
 	}
 }
 
@@ -34,7 +34,7 @@ func (tp *TodoPane) Template() string {
 }
 
 func (tp *TodoPane) GetData(ctx context.Context) (interface{}, error) {
-	todos := tp.todoService.GetTodos()
+	todos := tp.todoProvider.GetTodos()
 
 	return map[string]interface{}{
 		"Todos": todos,
@@ -80,7 +80,7 @@ func (tp *TodoPane) handleAddTodo(w http.ResponseWriter, r *http.Request) error 
 		return nil
 	}
 	
-	if err := tp.todoService.AddTodo(req.Message); err != nil {
+	if err := tp.todoProvider.AddTodo(req.Message); err != nil {
 		return err
 	}
 	
@@ -101,7 +101,7 @@ func (tp *TodoPane) handleToggleTodo(w http.ResponseWriter, r *http.Request) err
 		return nil
 	}
 	
-	if err := tp.todoService.ToggleTodo(index); err != nil {
+	if err := tp.todoProvider.ToggleTodo(index); err != nil {
 		return err
 	}
 	
