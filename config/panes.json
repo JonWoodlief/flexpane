@@ -1,0 +1,23 @@
+{
+  "enabled": ["calendar", "email", "todos"],
+  "layout": {
+    "calendar": {
+      "grid_area": {
+        "row": "1",
+        "column": "span 3"
+      }
+    },
+    "todos": {
+      "grid_area": {
+        "row": "2",
+        "column": "span 6"
+      }
+    },
+    "email": {
+      "grid_area": {
+        "row": "1",
+        "column": "span 3"
+      }
+    }
+  }
+}

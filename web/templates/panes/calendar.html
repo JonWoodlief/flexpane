@@ -1,0 +1,21 @@
+<!-- Calendar Pane Template -->
+{{if .Events}}
+    {{range .Events}}
+    <div class="calendar-event">
+        <div class="event-time">
+            {{.Start.Format "15:04"}}
+            {{if ne (.Start.Format "2006-01-02") (.End.Format "2006-01-02")}}
+                {{.Start.Format "Jan 2"}}
+            {{end}}
+        </div>
+        <div class="event-details">
+            <div class="event-title">{{.Title}}</div>
+            {{if .Location}}
+            <div class="event-location">📍 {{.Location}}</div>
+            {{end}}
+        </div>
+    </div>
+    {{end}}
+{{else}}
+    <div class="empty-state">No upcoming events</div>
+{{end}}

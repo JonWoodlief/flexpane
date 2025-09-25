@@ -1,0 +1,20 @@
+<!-- Todos Pane Template -->
+<!-- Add Todo Form -->
+<div class="todo-form">
+    <input type="text" id="new-todo" placeholder="Add a new todo..." maxlength="200">
+    <button id="add-todo-btn">Add</button>
+</div>
+
+<!-- Todo List -->
+<div class="todo-list">
+    {{if .Todos}}
+        {{range $index, $todo := .Todos}}
+        <div class="todo-item {{if .Done}}completed{{end}}" data-index="{{$index}}">
+            <input type="checkbox" class="todo-checkbox" {{if .Done}}checked{{end}}>
+            <span class="todo-text">{{.Message}}</span>
+        </div>
+        {{end}}
+    {{else}}
+        <div class="empty-state">No todos yet</div>
+    {{end}}
+</div>

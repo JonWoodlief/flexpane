@@ -1,0 +1,15 @@
+<!-- Email Pane Template -->
+{{if .Emails}}
+    {{range .Emails}}
+    <div class="email-item {{if not .Read}}unread{{end}}">
+        <div class="email-header">
+            <div class="email-from">{{.From}}</div>
+            <div class="email-time">{{.Time.Format "15:04"}}</div>
+        </div>
+        <div class="email-subject">{{.Subject}}</div>
+        <div class="email-preview">{{.Preview}}</div>
+    </div>
+    {{end}}
+{{else}}
+    <div class="empty-state">No recent emails</div>
+{{end}}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexplane</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Flexplane</h1>
+            <div class="header-info">
+                <span id="current-date"></span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            {{range .Panes}}
+                {{template "pane-wrapper.html" .}}
+            {{end}}
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

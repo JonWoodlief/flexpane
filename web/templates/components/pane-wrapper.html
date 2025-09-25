@@ -1,0 +1,16 @@
+<!-- Pane Wrapper Component -->
+<section class="pane" data-pane-id="{{.ID}}" style="grid-row: {{.GridArea.Row}}; grid-column: {{.GridArea.Column}};">
+    <header class="pane-header">
+        <h2>{{.Title}}</h2>
+        <span class="pane-count">{{.Data.Count}} items</span>
+    </header>
+    <div class="pane-content">
+        {{if eq .ID "calendar"}}
+            {{template "calendar.html" .Data}}
+        {{else if eq .ID "todos"}}
+            {{template "todos.html" .Data}}
+        {{else if eq .ID "email"}}
+            {{template "email.html" .Data}}
+        {{end}}
+    </div>
+</section>
